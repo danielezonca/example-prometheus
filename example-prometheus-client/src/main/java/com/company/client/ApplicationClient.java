@@ -77,7 +77,7 @@ public class ApplicationClient {
         String uriString = "http://localhost:8090/rest/server/prometheus";
         logger.info("SERVER_URL: " + uriString);
 
-        final int parallelism = 4;
+        final int parallelism = 8;
         final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
         final CyclicBarrier started = new CyclicBarrier(parallelism);
         final Callable<Long> task = () -> {
@@ -111,5 +111,6 @@ public class ApplicationClient {
         dmnContext.set("a", a);
         dmnContext.set("b", b);
         ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
+//        logger.info("result" + evaluateAll.getMsg());
     }
 }
