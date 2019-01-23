@@ -19,5 +19,17 @@
       </config-item>
     </configItems>
   </configuration>
-  <containers/>
+  <containers>
+    <container>
+      <containerId>function-definition</containerId>
+      <releaseId>
+        <groupId>org.kie.server.testing</groupId>
+        <artifactId>function-definition</artifactId>
+        <version>1.0.0.Final</version>
+      </releaseId>
+      <status>STARTED</status>
+      <configItems/>
+      <messages/>
+    </container>
+  </containers>
 </kie-server-state>

@@ -24,17 +24,24 @@
   </properties>
 
   <dependencies>
-    
-<dependency>
-    <groupId>org.kie</groupId>
-    <artifactId>kie-server-spring-boot-starter-drools</artifactId>
-    <version>${version.org.kie}</version>
-</dependency>
+
+    <dependency>
+      <groupId>org.kie</groupId>
+      <artifactId>kie-server-spring-boot-starter-drools</artifactId>
+      <version>${version.org.kie}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.kie.server</groupId>
+      <artifactId>kie-server-services-prometheus</artifactId>
+      <version>${version.org.kie}</version>
+
     </dependency>
   </dependencies>
 
@@ -43,13 +50,11 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        
       </plugin>
     </plugins>
   </build>
 
-  <profiles>  
-            
+  <profiles>
     <profile>
       <id>docker</id>
       <activation>
@@ -95,7 +100,7 @@
                         </fileSet>
                         <fileSet>
                           <directory>../example-prometheus-kjar/target/local-repository/maven</directory>
-                          <outputDirectory>opt/jboss/.m2/repository</outputDirectory>        
+                          <outputDirectory>opt/jboss/.m2/repository</outputDirectory>
                         </fileSet>
                       </inline>
                       <user>jboss:jboss:jboss</user>
@@ -167,7 +172,7 @@
                         </fileSet>
                         <fileSet>
                           <directory>../example-prometheus-kjar/target/local-repository/maven</directory>
-                          <outputDirectory>opt/jboss/.m2/repository</outputDirectory>        
+                          <outputDirectory>opt/jboss/.m2/repository</outputDirectory>
                         </fileSet>
                       </inline>
                       <user>jboss:jboss:jboss</user>
@@ -194,7 +199,7 @@
     </profile>
   </profiles>
 
-  <repositories>    
+  <repositories>
     <repository>
       <id>jboss-public-repository-group</id>
       <name>JBoss Public Repository Group</name>
