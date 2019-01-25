@@ -31,8 +31,7 @@ max_over_time(dmn_evaluate_decision_nanosecond_bucket[5m])
 
 histogram_quantile(
     0.5,
-    sum without (instance)(rate(dmn_evaluate_decision_nanosecond_bucket[5m])))
+    sum without (instance)(rate(dmn_evaluate_decision_nanosecond_bucket[5s])))
     
-    
-### Demo
+        
 
