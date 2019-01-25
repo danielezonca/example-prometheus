@@ -18,7 +18,6 @@ import org.kie.server.client.DMNServicesClient;
 import org.kie.server.client.KieServicesClient;
 import org.kie.server.client.KieServicesConfiguration;
 import org.kie.server.client.KieServicesFactory;
-import org.kie.server.integrationtests.config.TestConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +54,7 @@ public class ApplicationClient {
     static String CONTAINER_1_ID = "function-definition";
 
     public static void main(String[] args) throws Exception {
-        System.out.println("hello world");
+        logger.info("Starting kie-server requests");
 
         ApplicationClient applicationClient = new ApplicationClient();
 
@@ -66,18 +65,15 @@ public class ApplicationClient {
                 "1.0.0.Final");
 
         KieContainerResource containerResource = new KieContainerResource(CONTAINER_1_ID, kjar1);
-//        containerResource.setConfigItems(Arrays.asList(configItems));
 
         client.deactivateContainer(CONTAINER_1_ID);
         client.disposeContainer(CONTAINER_1_ID);
         ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, containerResource);
-
-        System.out.println("type = " + reply);
-
+        
         String uriString = "http://localhost:8090/rest/server/prometheus";
         logger.info("SERVER_URL: " + uriString);
 
-        final int parallelism = 8;
+        final int parallelism = Integer.valueOf(args[0]);
         final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
         final CyclicBarrier started = new CyclicBarrier(parallelism);
         final Callable<Long> task = () -> {
@@ -87,6 +83,9 @@ public class ApplicationClient {
             while (!current.isInterrupted()) {
                 evaluateDMNWithPause(applicationClient.getDmnClient());
                 executions++;
+                if(executions % 1000 == 0) {
+                    logger.info(executions + " requests sent");
+                }
             }
             return executions;
         };

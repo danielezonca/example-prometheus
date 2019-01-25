@@ -1,10 +1,17 @@
-${Ansi.GREEN}   _ ______ ______ ___  ___  ______              _                            ___                 _  _              _    _
-${Ansi.GREEN}  (_)| ___ \| ___ \|  \/  |  | ___ \            (_)                          / _ \               | |(_)            | |  (_)
-${Ansi.GREEN}   _ | |_/ /| |_/ /| .  . |  | |_/ / _   _  ___  _  _ __    ___  ___  ___   / /_\ \ _ __   _ __  | | _   ___  __ _ | |_  _   ___   _ __
-${Ansi.GREEN}  | || ___ \|  __/ | |\/| |  | ___ \| | | |/ __|| || '_ \  / _ \/ __|/ __|  |  _  || '_ \ | '_ \ | || | / __|/ _` || __|| | / _ \ | '_ \
-${Ansi.GREEN}  | || |_/ /| |    | |  | |  | |_/ /| |_| |\__ \| || | | ||  __/\__ \\__ \  | | | || |_) || |_) || || || (__| (_| || |_ | || (_) || | | |
-${Ansi.GREEN}  | |\____/ \_|    \_|  |_/  \____/  \__,_||___/|_||_| |_| \___||___/|___/  \_| |_/| .__/ | .__/ |_||_| \___|\__,_| \__||_| \___/ |_| |_|
-${Ansi.GREEN} _/ |                                                                              | |    | |
-${Ansi.GREEN}|__/                                                                               |_|    |_|
+${Ansi.GREEN}
+${Ansi.GREEN}     `-/++++++++/-`
+${Ansi.GREEN}   :o+-`        .:++.
+${Ansi.GREEN} `s/               .s:
+${Ansi.GREEN} s/                 `y`                                                            .--
+${Ansi.GREEN}.y   `:              o/   `oooooooo+/-`                                            :so
+${Ansi.GREEN}-y   .o            `./+   `ss/```..:/os+`                                          :so
+${Ansi.GREEN}`y.  .o          .:-`/+   `ss:       `/so.  `::` .::-   .:/++/:.      `-/++//-`    :so    .:////:-`
+${Ansi.GREEN} .s- -o    -/:/:`/   +/   `ss:         +so  `ss+oo++: .os+---:+s+`   /so:---/oo:   :so   +s+:---:+/
+${Ansi.GREEN}  `//-+         `/`  s-   `ss:         :ss. `ss/`    .ss-      /so  /so`     .os:  :so  .ss.
+${Ansi.GREEN}     :/          :- `h`   `ss:         :ss. `ss-     /so       .ss.`ss:       +s+  :so   +so+/:-.
+${Ansi.GREEN}     +-       ----` :s    `ss:         os+  `ss-     /so       .ss-`ss-       /so  :so    .-:/+oso:
+${Ansi.GREEN}     :             `y-    `ss:       .+s+`  `ss-     -ss.      :so` +s+      `os:  :so          :ss`
+${Ansi.GREEN}      .++/`       `o/     `ss/----:/oso:    `ss-      :so:.``./so.  `+s+-```-os/   :so  -+:.```.+s+
+${Ansi.GREEN}         .o+`    -s:       +++++++/:-.      `++.       `:+oooo/-`     -/+ooo+/.    -++  `:/+ooo+/-
+${Ansi.GREEN}           .+++++:`
 ${Ansi.RED}                                                    example-prometheus-service :: v.1.0-SNAPSHOT
-
