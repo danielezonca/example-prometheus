@@ -12,5 +12,10 @@ histogram_quantile(
     0.5,
     sum without (instance)(rate(dmn_evaluate_decision_nanosecond_bucket[5s])))
     
-        
 
+rate(dmn_evaluate_decision_nanosecond_bucket{le='+Inf'}[5s])
+
+
+  rate(dmn_evaluate_decision_nanosecond_sum[5s])
+/
+  rate(dmn_evaluate_decision_nanosecond_count[5s])
