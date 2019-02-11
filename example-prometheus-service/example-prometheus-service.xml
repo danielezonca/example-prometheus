@@ -67,5 +67,16 @@
       <configItems/>
       <messages/>
     </container>
+    <container>
+      <containerId>function-definition</containerId>
+      <releaseId>
+        <groupId>com.company</groupId>
+        <artifactId>example-prometheus-kjar</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </releaseId>
+      <status>STARTED</status>
+      <configItems/>
+      <messages/>
+    </container>
   </containers>
 </kie-server-state>
