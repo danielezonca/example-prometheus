@@ -61,8 +61,8 @@ public class ApplicationClient {
         KieServicesClient client = applicationClient.createDefaultClient();
 
         ReleaseId kjar1 = new ReleaseId(
-                "org.kie.server.testing", "function-definition",
-                "1.0.0.Final");
+                "com.company", "example-prometheus-kjar",
+                "1.0-SNAPSHOT");
 
         KieContainerResource containerResource = new KieContainerResource(CONTAINER_1_ID, kjar1);
 
@@ -107,7 +107,6 @@ public class ApplicationClient {
         dmnContext.set("a", a);
         dmnContext.set("b", b);
         ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
-        System.out.println(evaluateAll);
 //        logger.info("result" + evaluateAll.getMsg());
     }
 }
