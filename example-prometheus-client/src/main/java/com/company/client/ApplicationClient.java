@@ -69,9 +69,6 @@ public class ApplicationClient {
         client.deactivateContainer(CONTAINER_1_ID);
         client.disposeContainer(CONTAINER_1_ID);
         ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, containerResource);
-        
-        String uriString = "http://localhost:8090/rest/server/prometheus";
-        logger.info("SERVER_URL: " + uriString);
 
         final int parallelism = Integer.valueOf(args[0]);
         final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
@@ -110,6 +107,7 @@ public class ApplicationClient {
         dmnContext.set("a", a);
         dmnContext.set("b", b);
         ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
+        System.out.println(evaluateAll);
 //        logger.info("result" + evaluateAll.getMsg());
     }
 }
