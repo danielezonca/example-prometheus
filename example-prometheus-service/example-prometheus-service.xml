@@ -3,8 +3,8 @@
   <configuration>
     <configItems>
       <config-item>
-        <name>org.kie.server.controller</name>
-        <value></value>
+        <name>org.kie.server.location</name>
+        <value>http://localhost:8090/rest/server</value>
         <type>java.lang.String</type>
       </config-item>
       <config-item>
@@ -13,8 +13,8 @@
         <type>java.lang.String</type>
       </config-item>
       <config-item>
-        <name>org.kie.server.location</name>
-        <value>http://localhost:8090/rest/server</value>
+        <name>org.kie.server.controller</name>
+        <value></value>
         <type>java.lang.String</type>
       </config-item>
     </configItems>
@@ -55,17 +55,6 @@
       </configItems>
       <messages/>
       <containerAlias>example-prometheus-kjar</containerAlias>
-    </container>
-    <container>
-      <containerId>function-definition</containerId>
-      <releaseId>
-        <groupId>org.kie.server.testing</groupId>
-        <artifactId>function-definition</artifactId>
-        <version>1.0.0.Final</version>
-      </releaseId>
-      <status>STARTED</status>
-      <configItems/>
-      <messages/>
     </container>
     <container>
       <containerId>function-definition</containerId>
