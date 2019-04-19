@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.kie.dmn.api.core.DMNContext;
+import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
@@ -27,6 +28,7 @@ public class ApplicationClient {
 
     protected DMNServicesClient dmnClient;
     public KieServicesConfiguration configuration;
+    private ArrayList<Future<Long>> tasks;
 
     protected void setupClients(KieServicesClient kieServicesClient) {
         this.dmnClient = kieServicesClient.getServicesClient(DMNServicesClient.class);
@@ -75,27 +77,31 @@ public class ApplicationClient {
 
         final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
         final CyclicBarrier started = new CyclicBarrier(parallelism);
-        final Callable<Long> task = () -> {
-            started.await();
-            final Thread current = Thread.currentThread();
-            long executions = 0;
-            while (!current.isInterrupted()) {
-                evaluateDMNWithPause(getDmnClient());
-                executions++;
-                if (executions % 1000 == 0) {
-                    logger.info(executions + " requests sent");
+        final Callable<Long> task = new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                started.await();
+                final Thread current = Thread.currentThread();
+                long executions = 0;
+                while (!current.isInterrupted()) {
+                    ApplicationClient.this.evaluateDMNWithPause(ApplicationClient.this.getDmnClient());
+                    executions++;
+                    if (executions % 1000 == 0) {
+                        logger.info(executions + " requests sent");
+                    }
                 }
+                return executions;
             }
-            return executions;
         };
-        final ArrayList<Future<Long>> tasks = new ArrayList<>(parallelism);
+        tasks = new ArrayList<>(parallelism);
         for (int i = 0; i < parallelism; i++) {
             tasks.add(executor.submit(task));
         }
-        executor.shutdown();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            tasks.forEach(future -> future.cancel(true));
-        }));
+        controller.label.setText("Started service");
+    }
+
+    public void stop() {
+        tasks.forEach(future -> future.cancel(true));
     }
 
     private void evaluateDMNWithPause(DMNServicesClient dmnClient) {
@@ -111,9 +117,8 @@ public class ApplicationClient {
         ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
 
         DMNResult result = evaluateAll.getResult();
-
-        controller.helloWorld.setText(result.getDecisionResultById("a").toString());
-
-//        logger.info("result" + evaluateAll.getMsg());
+//        DMNDecisionResult sum = result.getDecisionResultById("Sum");
+//        System.out.println("sum = " + sum);
+//        logger.info(sum.toString());
     }
 }

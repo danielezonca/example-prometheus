@@ -6,10 +6,15 @@ import javafx.scene.control.Label;
 
 public class Controller {
 
-    public Label helloWorld;
+    public Label label;
+    private ApplicationClient applicationClient;
 
-    public void sayHelloWorld(ActionEvent actionEvent) throws Exception {
-        new ApplicationClient(1, this).run();
+    public void startService(ActionEvent actionEvent) throws Exception {
+        applicationClient = new ApplicationClient(1, this);
+        applicationClient.run();
     }
 
+    public void stopService(ActionEvent actionEvent) {
+        applicationClient.stop();
+    }
 }

@@ -4,6 +4,7 @@
 <GridPane fx:controller="com.company.Controller"
           xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">
 
-  <Button text="Say Hello world" onAction="#sayHelloWorld" />
-  <Label GridPane.rowIndex="1" fx:id="helloWorld" />
+  <Button text="Start calling service" onAction="#startService" GridPane.rowIndex="1"/>
+  <Button text="Stop calling service" onAction="#stopService" GridPane.rowIndex="2"/>
+  <Label fx:id="label" GridPane.rowIndex="3" />
 </GridPane>
