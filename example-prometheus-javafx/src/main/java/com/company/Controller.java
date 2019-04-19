@@ -12,9 +12,12 @@ public class Controller {
     public void startService(ActionEvent actionEvent) throws Exception {
         applicationClient = new ApplicationClient(1, this);
         applicationClient.run();
+        label.setText("Started service");
     }
 
     public void stopService(ActionEvent actionEvent) {
         applicationClient.stop();
+        label.setText("Stopped service");
+
     }
 }

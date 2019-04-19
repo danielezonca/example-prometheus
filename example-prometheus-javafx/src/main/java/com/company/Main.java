@@ -14,7 +14,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         URL resource = getClass().getResource("sample.fxml");
         Parent root = FXMLLoader.load(resource);
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("Calling DMN Kie Server");
         primaryStage.setScene(new Scene(root, 300, 275));
         primaryStage.show();
     }

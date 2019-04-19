@@ -9,7 +9,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.kie.dmn.api.core.DMNContext;
-import org.kie.dmn.api.core.DMNDecisionResult;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.marshalling.MarshallingFormat;
 import org.kie.server.api.model.KieContainerResource;
@@ -24,27 +23,26 @@ import org.slf4j.LoggerFactory;
 
 public class ApplicationClient {
 
-    static Logger logger = LoggerFactory.getLogger(ApplicationClient.class);
+    private static Logger logger = LoggerFactory.getLogger(ApplicationClient.class);
 
-    protected DMNServicesClient dmnClient;
-    public KieServicesConfiguration configuration;
+    private final int parallelism;
+    private final Controller controller;
+    private DMNServicesClient dmnClient;
+    private KieServicesConfiguration configuration;
+
     private ArrayList<Future<Long>> tasks;
 
-    protected void setupClients(KieServicesClient kieServicesClient) {
-        this.dmnClient = kieServicesClient.getServicesClient(DMNServicesClient.class);
-    }
-
-    final int parallelism;
-    private final Controller controller;
-
-    public ApplicationClient(int parallelism, Controller controller) {
+    ApplicationClient(int parallelism, Controller controller) {
         this.parallelism = parallelism;
         this.controller = controller;
         configuration = KieServicesFactory.newRestConfiguration("http://localhost:8090/rest/server", "wbadmin", "wbadmin");
     }
 
-    protected KieServicesClient createDefaultClient() throws Exception {
+    private void setupClients(KieServicesClient kieServicesClient) {
+        this.dmnClient = kieServicesClient.getServicesClient(DMNServicesClient.class);
+    }
 
+    private KieServicesClient createDefaultClient() {
         configuration.setTimeout(3000);
         configuration.setMarshallingFormat(MarshallingFormat.JSON);
 
@@ -52,10 +50,6 @@ public class ApplicationClient {
 
         setupClients(kieServicesClient);
         return kieServicesClient;
-    }
-
-    public DMNServicesClient getDmnClient() {
-        return dmnClient;
     }
 
     String CONTAINER_1_ID = "function-definition";
@@ -77,34 +71,30 @@ public class ApplicationClient {
 
         final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
         final CyclicBarrier started = new CyclicBarrier(parallelism);
-        final Callable<Long> task = new Callable<Long>() {
-            @Override
-            public Long call() throws Exception {
-                started.await();
-                final Thread current = Thread.currentThread();
-                long executions = 0;
-                while (!current.isInterrupted()) {
-                    ApplicationClient.this.evaluateDMNWithPause(ApplicationClient.this.getDmnClient());
-                    executions++;
-                    if (executions % 1000 == 0) {
-                        logger.info(executions + " requests sent");
-                    }
+        final Callable<Long> task = () -> {
+            started.await();
+            final Thread current = Thread.currentThread();
+            long executions = 0;
+            while (!current.isInterrupted()) {
+                ApplicationClient.this.evaluateDMNWithPause();
+                executions++;
+                if (executions % 1000 == 0) {
+                    logger.info(executions + " requests sent");
                 }
-                return executions;
             }
+            return executions;
         };
         tasks = new ArrayList<>(parallelism);
         for (int i = 0; i < parallelism; i++) {
             tasks.add(executor.submit(task));
         }
-        controller.label.setText("Started service");
     }
 
     public void stop() {
         tasks.forEach(future -> future.cancel(true));
     }
 
-    private void evaluateDMNWithPause(DMNServicesClient dmnClient) {
+    private void evaluateDMNWithPause() {
         DMNContext dmnContext = dmnClient.newContext();
 
         ThreadLocalRandom salaryRandom = ThreadLocalRandom.current();
