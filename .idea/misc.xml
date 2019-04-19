@@ -9,6 +9,8 @@
         <option value="$PROJECT_DIR$/example-prometheus-service/pom.xml" />
         <option value="$PROJECT_DIR$/example-prometheus-client/target/maven-archiver/pom.properties" />
         <option value="$PROJECT_DIR$/example-prometheus-client/pom.xml" />
+        <option value="$PROJECT_DIR$/example-prometheus-desktop/target/maven-archiver/pom.properties" />
+        <option value="$PROJECT_DIR$/example-prometheus-desktop/pom.xml" />
       </list>
     </option>
   </component>

@@ -12,6 +12,7 @@
         <module name="example-prometheus-service" />
         <module name="example-prometheus-service (1)" />
         <module name="maven-archiver" />
+        <module name="maven-archiver (1)" />
       </profile>
     </annotationProcessing>
   </component>
