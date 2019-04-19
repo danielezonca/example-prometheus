@@ -11,7 +11,14 @@
         <option value="$PROJECT_DIR$/example-prometheus-client/pom.xml" />
         <option value="$PROJECT_DIR$/example-prometheus-desktop/target/maven-archiver/pom.properties" />
         <option value="$PROJECT_DIR$/example-prometheus-desktop/pom.xml" />
+        <option value="$PROJECT_DIR$/example-prometheus-javafx/target/maven-archiver/pom.properties" />
+        <option value="$PROJECT_DIR$/example-prometheus-javafx/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/example-prometheus-client/desktop-client-fx/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK">

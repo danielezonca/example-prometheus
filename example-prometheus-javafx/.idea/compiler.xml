@@ -7,17 +7,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="example-prometheus-javafx" />
-        <module name="example-prometheus-kjar" />
-        <module name="example-prometheus-model" />
-        <module name="example-prometheus-service" />
         <module name="maven-archiver" />
-        <module name="maven-archiver (1)" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="desktopclientfx" target="1.5" />
-      <module name="example-prometheus-client" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
   <component name="HaskellBuildOptions">
     <ghcPath>/usr/bin/ghc</ghcPath>
