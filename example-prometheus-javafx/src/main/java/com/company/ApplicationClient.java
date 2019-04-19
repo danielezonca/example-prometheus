@@ -32,7 +32,12 @@ public class ApplicationClient {
         this.dmnClient = kieServicesClient.getServicesClient(DMNServicesClient.class);
     }
 
-    public ApplicationClient() {
+    final int parallelism;
+    private final Controller controller;
+
+    public ApplicationClient(int parallelism, Controller controller) {
+        this.parallelism = parallelism;
+        this.controller = controller;
         configuration = KieServicesFactory.newRestConfiguration("http://localhost:8090/rest/server", "wbadmin", "wbadmin");
     }
 
@@ -51,14 +56,12 @@ public class ApplicationClient {
         return dmnClient;
     }
 
-    static String CONTAINER_1_ID = "function-definition";
+    String CONTAINER_1_ID = "function-definition";
 
-    public static void main(String[] args) throws Exception {
+    public void run() throws Exception {
         logger.info("Starting kie-server requests");
 
-        ApplicationClient applicationClient = new ApplicationClient();
-
-        KieServicesClient client = applicationClient.createDefaultClient();
+        KieServicesClient client = createDefaultClient();
 
         ReleaseId kjar1 = new ReleaseId(
                 "com.company", "example-prometheus-kjar",
@@ -70,7 +73,6 @@ public class ApplicationClient {
         client.disposeContainer(CONTAINER_1_ID);
         ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, containerResource);
 
-        final int parallelism = Integer.valueOf(args[0]);
         final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
         final CyclicBarrier started = new CyclicBarrier(parallelism);
         final Callable<Long> task = () -> {
@@ -78,9 +80,9 @@ public class ApplicationClient {
             final Thread current = Thread.currentThread();
             long executions = 0;
             while (!current.isInterrupted()) {
-                evaluateDMNWithPause(applicationClient.getDmnClient());
+                evaluateDMNWithPause(getDmnClient());
                 executions++;
-                if(executions % 1000 == 0) {
+                if (executions % 1000 == 0) {
                     logger.info(executions + " requests sent");
                 }
             }
@@ -96,7 +98,7 @@ public class ApplicationClient {
         }));
     }
 
-    private static void evaluateDMNWithPause(DMNServicesClient dmnClient) {
+    private void evaluateDMNWithPause(DMNServicesClient dmnClient) {
         DMNContext dmnContext = dmnClient.newContext();
 
         ThreadLocalRandom salaryRandom = ThreadLocalRandom.current();
@@ -107,6 +109,11 @@ public class ApplicationClient {
         dmnContext.set("a", a);
         dmnContext.set("b", b);
         ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
+
+        DMNResult result = evaluateAll.getResult();
+
+        controller.helloWorld.setText(result.getDecisionResultById("a").toString());
+
 //        logger.info("result" + evaluateAll.getMsg());
     }
 }

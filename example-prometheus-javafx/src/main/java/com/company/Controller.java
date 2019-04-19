@@ -8,8 +8,8 @@ public class Controller {
 
     public Label helloWorld;
 
-    public void sayHelloWorld(ActionEvent actionEvent) {
-        helloWorld.setText("Hello world!");
+    public void sayHelloWorld(ActionEvent actionEvent) throws Exception {
+        new ApplicationClient(1, this).run();
     }
 
 }
