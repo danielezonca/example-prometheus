@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javafx.application.Platform;
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.marshalling.MarshallingFormat;
@@ -55,7 +56,7 @@ public class ApplicationClient {
     String CONTAINER_1_ID = "function-definition";
 
     public void run() throws Exception {
-        logger.info("Starting kie-server requests");
+        logger.info("Starting kie-server requests with " + parallelism + " threads");
 
         KieServicesClient client = createDefaultClient();
 
@@ -79,7 +80,11 @@ public class ApplicationClient {
                 ApplicationClient.this.evaluateDMNWithPause();
                 executions++;
                 if (executions % 1000 == 0) {
-                    logger.info(executions + " requests sent");
+                    String message = executions + " requests sent";
+                    logger.info(message);
+                    Platform.runLater(() -> {
+                        controller.label2.setText(message);
+                    });
                 }
             }
             return executions;
@@ -91,6 +96,8 @@ public class ApplicationClient {
     }
 
     void stop() {
+        logger.info("Stopped kie-server requests");
+
         tasks.forEach(future -> future.cancel(true));
     }
 
