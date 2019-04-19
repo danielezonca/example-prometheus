@@ -90,7 +90,7 @@ public class ApplicationClient {
         }
     }
 
-    public void stop() {
+    void stop() {
         tasks.forEach(future -> future.cancel(true));
     }
 
