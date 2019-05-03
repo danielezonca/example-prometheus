@@ -28,12 +28,19 @@ public class ApplicationClient {
     protected DMNServicesClient dmnClient;
     public KieServicesConfiguration configuration;
 
+    public static String SERVER_URL = "serverURL";
+    public static String USERNAME = "username";
+    public static String PASSWORD = "password";
+
     protected void setupClients(KieServicesClient kieServicesClient) {
         this.dmnClient = kieServicesClient.getServicesClient(DMNServicesClient.class);
     }
 
     public ApplicationClient() {
-        configuration = KieServicesFactory.newRestConfiguration("http://localhost:8090/rest/server", "wbadmin", "wbadmin");
+        String url = System.getProperty(SERVER_URL, "http://localhost:8090/rest/server");
+        String username = System.getProperty(USERNAME, "wbadmin");
+        String password = System.getProperty(PASSWORD, "wbadmin");
+        configuration = KieServicesFactory.newRestConfiguration(url, username, password);
     }
 
     protected KieServicesClient createDefaultClient() throws Exception {

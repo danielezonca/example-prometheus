@@ -4,9 +4,6 @@
   <groupId>com.company</groupId>
   <artifactId>example-prometheus-client</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <modules>
-    <module>desktop-client-fx</module>
-  </modules>
   <packaging>pom</packaging>
   <name>example-prometheus-client</name>
 
