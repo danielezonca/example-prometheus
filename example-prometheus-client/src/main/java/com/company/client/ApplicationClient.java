@@ -77,7 +77,7 @@ public class ApplicationClient {
         client.disposeContainer(CONTAINER_1_ID);
         ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, containerResource);
 
-        final int parallelism = 1; //Integer.valueOf(args[0]);
+        final int parallelism = Integer.valueOf(args[0]);
         final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
         final CyclicBarrier started = new CyclicBarrier(parallelism);
         final Callable<Long> task = () -> {
