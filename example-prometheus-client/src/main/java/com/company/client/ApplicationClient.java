@@ -58,7 +58,7 @@ public class ApplicationClient {
         return dmnClient;
     }
 
-    static String CONTAINER_1_ID = "function-definition";
+    static String CONTAINER_1_ID = "Credit Risk Classifier";
 
     public static void main(String[] args) throws Exception {
         logger.info("Starting kie-server requests");
@@ -77,7 +77,7 @@ public class ApplicationClient {
         client.disposeContainer(CONTAINER_1_ID);
         ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, containerResource);
 
-        final int parallelism = Integer.valueOf(args[0]);
+        final int parallelism = 1; //Integer.valueOf(args[0]);
         final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
         final CyclicBarrier started = new CyclicBarrier(parallelism);
         final Callable<Long> task = () -> {
@@ -111,8 +111,8 @@ public class ApplicationClient {
         int a = salaryRandom.nextInt(1000, 100000 / 12);
         int b = salaryRandom.nextInt(1000, 100000 / 12);
 
-        dmnContext.set("a", a);
-        dmnContext.set("b", b);
+        dmnContext.set("transactionId", a);
+        dmnContext.set("amount", b);
         ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
 //        logger.info("result" + evaluateAll.getMsg());
     }
