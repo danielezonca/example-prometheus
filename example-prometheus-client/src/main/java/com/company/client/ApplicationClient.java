@@ -1,18 +1,21 @@
 package com.company.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.kie.dmn.api.core.DMNContext;
 import org.kie.dmn.api.core.DMNResult;
 import org.kie.server.api.marshalling.MarshallingFormat;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.ReleaseId;
 import org.kie.server.api.model.ServiceResponse;
 import org.kie.server.client.DMNServicesClient;
 import org.kie.server.client.KieServicesClient;
@@ -27,10 +30,18 @@ public class ApplicationClient {
 
     protected DMNServicesClient dmnClient;
     public KieServicesConfiguration configuration;
+    public static String containerId;
+    public static String namespace;
+    public static String name;
+    public static List<String[]> sampleData = new ArrayList<>();
+    public static AtomicInteger counter = new AtomicInteger(0);
 
     public static String SERVER_URL = "serverURL";
     public static String USERNAME = "username";
     public static String PASSWORD = "password";
+    public static String CONTAINER_ID_PARAMETER_KEY = "containerId";
+    public static String NAMESPACE_PARAMETER_KEY = "namespace";
+    public static String NAME_PARAMETER_KEY = "name";
 
     protected void setupClients(KieServicesClient kieServicesClient) {
         this.dmnClient = kieServicesClient.getServicesClient(DMNServicesClient.class);
@@ -40,6 +51,7 @@ public class ApplicationClient {
         String url = System.getProperty(SERVER_URL, "http://localhost:8090/rest/server");
         String username = System.getProperty(USERNAME, "wbadmin");
         String password = System.getProperty(PASSWORD, "wbadmin");
+
         configuration = KieServicesFactory.newRestConfiguration(url, username, password);
     }
 
@@ -58,26 +70,26 @@ public class ApplicationClient {
         return dmnClient;
     }
 
-    static String CONTAINER_1_ID = "Credit Risk Classifier";
-
     public static void main(String[] args) throws Exception {
         logger.info("Starting kie-server requests");
 
         ApplicationClient applicationClient = new ApplicationClient();
 
-        KieServicesClient client = applicationClient.createDefaultClient();
+        containerId = Optional.ofNullable(System.getProperty(CONTAINER_ID_PARAMETER_KEY))
+                .orElseThrow(() -> new IllegalStateException("containerId parameter is mandatory"));
 
-        ReleaseId kjar1 = new ReleaseId(
-                "com.company", "example-prometheus-kjar",
-                "1.0-SNAPSHOT");
+        namespace = Optional.ofNullable(System.getProperty(NAMESPACE_PARAMETER_KEY))
+                .orElseThrow(() -> new IllegalStateException("namespace parameter is mandatory"));
 
-        KieContainerResource containerResource = new KieContainerResource(CONTAINER_1_ID, kjar1);
+        name = Optional.ofNullable(System.getProperty(NAME_PARAMETER_KEY))
+                .orElseThrow(() -> new IllegalStateException("name parameter is mandatory"));
 
-        client.deactivateContainer(CONTAINER_1_ID);
-        client.disposeContainer(CONTAINER_1_ID);
-        ServiceResponse<KieContainerResource> reply = client.createContainer(CONTAINER_1_ID, containerResource);
 
-        final int parallelism = Integer.valueOf(args[0]);
+        loadSampleData();
+
+        applicationClient.createDefaultClient();
+
+        final int parallelism = args.length > 0 ? Integer.valueOf(args[0]) : 1;
         final ExecutorService executor = Executors.newFixedThreadPool(parallelism);
         final CyclicBarrier started = new CyclicBarrier(parallelism);
         final Callable<Long> task = () -> {
@@ -87,7 +99,7 @@ public class ApplicationClient {
             while (!current.isInterrupted()) {
                 evaluateDMNWithPause(applicationClient.getDmnClient());
                 executions++;
-                if(executions % 1000 == 0) {
+                if (executions % 1000 == 0) {
                     logger.info(executions + " requests sent");
                 }
             }
@@ -103,17 +115,30 @@ public class ApplicationClient {
         }));
     }
 
+    private static void loadSampleData() {
+        String text = new Scanner(ApplicationClient.class.getResourceAsStream("sampleData"), "UTF-8").useDelimiter("\\Z").next();
+
+        sampleData = Arrays.stream(text.split("\\n"))
+                .map(row -> row.split(","))
+                .collect(Collectors.toList());
+    }
+
     private static void evaluateDMNWithPause(DMNServicesClient dmnClient) {
         DMNContext dmnContext = dmnClient.newContext();
 
-        ThreadLocalRandom salaryRandom = ThreadLocalRandom.current();
+        int index = sampleData.size() % counter.getAndIncrement();
+        String[] sampleDataRow = sampleData.get(index);
 
-        int a = salaryRandom.nextInt(1000, 100000 / 12);
-        int b = salaryRandom.nextInt(1000, 100000 / 12);
+        double fraudAmount = Double.valueOf(sampleDataRow[0]);
+        String cardHolderStatus = sampleDataRow[1];
+        double incidentCount = Double.valueOf(sampleDataRow[2]);
+        double age = Double.valueOf(sampleDataRow[3]);
 
-        dmnContext.set("transactionId", a);
-        dmnContext.set("amount", b);
-        ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(CONTAINER_1_ID, dmnContext);
+        dmnContext.set("Fraud Amount", fraudAmount);
+        dmnContext.set("Cardholder Status", cardHolderStatus);
+        dmnContext.set("Incident Count", incidentCount);
+        dmnContext.set("Age", age);
+        ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(containerId, namespace, name, dmnContext);
 //        logger.info("result" + evaluateAll.getMsg());
     }
 }
