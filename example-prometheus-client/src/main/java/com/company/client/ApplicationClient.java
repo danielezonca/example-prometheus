@@ -33,6 +33,7 @@ public class ApplicationClient {
     public static String containerId;
     public static String namespace;
     public static String name;
+    public static int nrOfEntries;
     public static List<String[]> sampleData = new ArrayList<>();
     public static AtomicInteger counter = new AtomicInteger(0);
 
@@ -42,6 +43,7 @@ public class ApplicationClient {
     public static String CONTAINER_ID_PARAMETER_KEY = "containerId";
     public static String NAMESPACE_PARAMETER_KEY = "namespace";
     public static String NAME_PARAMETER_KEY = "name";
+    public static String NR_OF_ENTRIES_PARAMETER_KEY = "nrOfEntries";
 
     protected void setupClients(KieServicesClient kieServicesClient) {
         this.dmnClient = kieServicesClient.getServicesClient(DMNServicesClient.class);
@@ -84,6 +86,8 @@ public class ApplicationClient {
         name = Optional.ofNullable(System.getProperty(NAME_PARAMETER_KEY))
                 .orElseThrow(() -> new IllegalStateException("name parameter is mandatory"));
 
+        String nrOfEntriesString = System.getProperty("nrOfEntries", Integer.toString(10));
+        nrOfEntries = Integer.parseInt(nrOfEntriesString);
 
         loadSampleData();
 
@@ -96,13 +100,14 @@ public class ApplicationClient {
             started.await();
             final Thread current = Thread.currentThread();
             long executions = 0;
-            while (!current.isInterrupted()) {
+            while (!current.isInterrupted() && (counter.get() < nrOfEntries || nrOfEntries == -1)) {
                 evaluateDMNWithPause(applicationClient.getDmnClient());
                 executions++;
                 if (executions % 1000 == 0) {
                     logger.info(executions + " requests sent");
                 }
             }
+            logger.info("Thread '" + current.getId() + "' executed '" + executions + "'' requests.");
             return executions;
         };
         final ArrayList<Future<Long>> tasks = new ArrayList<>(parallelism);
@@ -116,29 +121,35 @@ public class ApplicationClient {
     }
 
     private static void loadSampleData() {
-        String text = new Scanner(ApplicationClient.class.getResourceAsStream("sampleData"), "UTF-8").useDelimiter("\\Z").next();
+        String text = new Scanner(ApplicationClient.class.getClassLoader().getResourceAsStream("sampleDataLarge"), "UTF-8")
+                .useDelimiter("\\Z").next();
 
-        sampleData = Arrays.stream(text.split("\\n"))
-                .map(row -> row.split(","))
-                .collect(Collectors.toList());
+        sampleData = Arrays.stream(text.split("\\n")).map(row -> row.split(",")).collect(Collectors.toList());
     }
 
     private static void evaluateDMNWithPause(DMNServicesClient dmnClient) {
-        DMNContext dmnContext = dmnClient.newContext();
+        try {
+            DMNContext dmnContext = dmnClient.newContext();
 
-        int index = sampleData.size() % counter.getAndIncrement();
-        String[] sampleDataRow = sampleData.get(index);
+            int index = counter.getAndIncrement() % sampleData.size();
+            String[] sampleDataRow = sampleData.get(index);
 
-        double fraudAmount = Double.valueOf(sampleDataRow[0]);
-        String cardHolderStatus = sampleDataRow[1];
-        double incidentCount = Double.valueOf(sampleDataRow[2]);
-        double age = Double.valueOf(sampleDataRow[3]);
+            double fraudAmount = Double.valueOf(sampleDataRow[0]);
+            String cardHolderStatus = sampleDataRow[1];
+            double incidentCount = Double.valueOf(sampleDataRow[2]);
+            double age = Double.valueOf(sampleDataRow[3]);
 
-        dmnContext.set("Fraud Amount", fraudAmount);
-        dmnContext.set("Cardholder Status", cardHolderStatus);
-        dmnContext.set("Incident Count", incidentCount);
-        dmnContext.set("Age", age);
-        ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(containerId, namespace, name, dmnContext);
-//        logger.info("result" + evaluateAll.getMsg());
+            dmnContext.set("Fraud Amount", fraudAmount);
+            dmnContext.set("Cardholder Status", cardHolderStatus);
+            dmnContext.set("Incident Count", incidentCount);
+            dmnContext.set("Age", age);
+            logger.info("Evaluating DMN with values: Fraud Amount: " + fraudAmount + ", Cardholder Status: "
+                    + cardHolderStatus + ", Incident Count: " + incidentCount + ", Age: " + age);
+            ServiceResponse<DMNResult> evaluateAll = dmnClient.evaluateAll(containerId, namespace, name, dmnContext);
+            // logger.info("result" + evaluateAll.getMsg());
+        } catch (Throwable t) {
+            logger.error("Error during DMN Execution", t);
+            throw t;
+        }
     }
 }
