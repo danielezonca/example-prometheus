@@ -4,15 +4,10 @@
   <groupId>com.company</groupId>
   <artifactId>example-prometheus-client</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
   <name>example-prometheus-client</name>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.5.12.RELEASE</version>
-  </parent>
-
+  
   <properties>
     <version.org.kie>7.21.0.Final</version.org.kie>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -30,12 +25,6 @@
     <artifactId>kie-server-spring-boot-starter-drools</artifactId>
     <version>${version.org.kie}</version>
 </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      
-    </dependency>
 
     <dependency>
       <groupId>org.kie.server</groupId>
@@ -87,47 +76,17 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+      <version>1.7.26</version>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      
+      <version>1.2.3</version>
     </dependency>
 
     <!--  Stay with httpcomponents: it will save us pain (as opposed to changing from resteasy to cxf to cxf 3.0, etc. -->
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>fluent-hc</artifactId>
-      
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <!-- Replacement for the above excluded 'commons-logging:commons-logging' -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-    </dependency>
+   
   </dependencies>
 
   <build>
@@ -140,149 +99,4 @@
     </plugins>
   </build>
 
-  <profiles>  
-            
-    <profile>
-      <id>docker</id>
-      <activation>
-        <property>
-          <name>docker</name>
-        </property>
-      </activation>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>io.fabric8</groupId>
-            <artifactId>fabric8-maven-plugin</artifactId>
-            <version>${fabric8.version}</version>
-            <configuration>
-              <verbose>false</verbose>
-              <images>
-                <image>
-                  <name>apps/${project.artifactId}:${project.version}</name>
-                  <build>
-                    <from>fabric8/java-jboss-openjdk8-jdk</from>
-                    <assembly>
-                      <targetDir>/</targetDir>
-                      <inline>
-                        <files>
-                          <file>
-                            <source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source>
-                            <outputDirectory>deployments</outputDirectory>
-                            <destName>${project.build.finalName}.${project.packaging}</destName>
-                          </file>
-                          <file>
-                            <source>${project.artifactId}.xml</source>
-                            <outputDirectory>deployments</outputDirectory>
-                            <destName>${project.artifactId}.xml</destName>
-                          </file>
-                        </files>
-                        <fileSet>
-                          <directory>src/main/docker</directory>
-                          <outputDirectory>opt/jboss/.m2</outputDirectory>
-                          <includes>
-                            <include>settings.xml</include>
-                          </includes>
-                        </fileSet>
-                        <fileSet>
-                          <directory>../example-prometheus-kjar/target/local-repository/maven</directory>
-                          <outputDirectory>opt/jboss/.m2/repository</outputDirectory>        
-                        </fileSet>
-                      </inline>
-                      <user>jboss:jboss:jboss</user>
-                    </assembly>
-                  </build>
-                </image>
-              </images>
-            </configuration>
-            <executions>
-              <execution>
-                <phase>install</phase>
-                <goals>
-                  <goal>resource</goal>
-                  <goal>build</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>openshift</id>
-      <activation>
-        <property>
-          <name>openshift</name>
-        </property>
-      </activation>
-
-      <properties>
-        <fabric8.mode>openshift</fabric8.mode>
-        <fabric8.build.strategy>docker</fabric8.build.strategy>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>io.fabric8</groupId>
-            <artifactId>fabric8-maven-plugin</artifactId>
-            <version>${fabric8.version}</version>
-            <configuration>
-              <verbose>false</verbose>
-              <images>
-                <image>
-                  <name>apps/${project.artifactId}:${project.version}</name>
-                  <build>
-                    <from>fabric8/java-jboss-openjdk8-jdk</from>
-                    <assembly>
-                      <targetDir>/</targetDir>
-                      <inline>
-                        <files>
-                          <file>
-                            <source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source>
-                            <outputDirectory>deployments</outputDirectory>
-                            <destName>${project.build.finalName}.${project.packaging}</destName>
-                          </file>
-                          <file>
-                            <source>${project.artifactId}.xml</source>
-                            <outputDirectory>deployments</outputDirectory>
-                            <destName>${project.artifactId}.xml</destName>
-                          </file>
-                        </files>
-                        <fileSet>
-                          <directory>src/main/docker</directory>
-                          <outputDirectory>opt/jboss/.m2</outputDirectory>
-                          <includes>
-                            <include>settings.xml</include>
-                          </includes>
-                        </fileSet>
-                        <fileSet>
-                          <directory>../example-prometheus-kjar/target/local-repository/maven</directory>
-                          <outputDirectory>opt/jboss/.m2/repository</outputDirectory>        
-                        </fileSet>
-                      </inline>
-                      <user>jboss:jboss:jboss</user>
-                    </assembly>
-                    <ports>
-                      <port>8090</port>
-                    </ports>
-                  </build>
-                </image>
-              </images>
-            </configuration>
-            <executions>
-              <execution>
-                <phase>install</phase>
-                <goals>
-                  <goal>resource</goal>
-                  <goal>build</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
